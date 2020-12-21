@@ -1,0 +1,26 @@
+<html>
+<title>Ya Test</title>
+<head>
+   <meta charset="UTF-8">
+<script src="http://code.jquery.com/jquery-latest.js"></script>
+<script src="submit.js"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <form id="myForm" method="post">
+    <textarea name = "words" id = "words">Please enter ur words here</textarea> 
+
+    <input type="radio" name = "place" id = "regAll" value="225"> Россия
+    <input type="radio" name = "place" id = "regDubna" value="215">Дубна
+    <input type="radio" name = "place" id = "regMosow" value="213">Москва
+   <br>
+   Tokens 
+   <input type = "radio" name = "tokens" id = "token1">Токен 1</input> </br>
+    <input type="button" id="submitFormData" onclick="SubmitFormData();" value="Submit" />
+   </form>
+   Program log <br>
+   <textarea id="results">
+
+   </textarea>
+</body>
+</html>
