@@ -46,7 +46,7 @@ function utf8($struct) {
 
 # Делаем запрос на получение статистики
 
-# Nomera nujnih nam regionov
+# Номера регионов в хтмле 
 # 213 - Москва
 # 215 - Дубна
 # 225 - Russia
@@ -62,27 +62,30 @@ $request = getWordstat('CreateNewWordstatReport', array(
 						'Phrases' => $arrayWithWords,
 						'GeoID' => array((int)$regionGot))
 						);		
-# Отчет формируется
+# Отчет формируется, ждем, чем больше запросов, тем выше ставим время
 sleep(15);
 
-# Получаем ответ в виде объекта
 $result = getWordstat('GetWordstatReport', $request->data);
 
-# Сразу удаляем этот отчет, дабы не забивать свой аккаунт. Т.к. максимум 5 отчетов можно.
 getWordstat('DeleteWordstatReport', $request->data);
 
-# Обрабатываем отчет как хотим. В данный момент просто выводим на экран.
+# Обрабатываем отчет
 
 print_r(($result->data[0])->SearchedWith);
 
-$fp = fopen('lidn.txt', 'w');
+# Записываем информацию в файл
+$fp = fopen('lidn.csv', 'w');
 
-for ($i = 0; $i <= count($result->{data}); $i++) {
-  $strToBeWritten = ($result->data[$i])->Phrase . " " . ((($result->data[$i])->SearchedWith)[0]->Shows) . "\n";
-  fwrite($fp , $strToBeWritten);
+for ($i = 0; $i <= count($result->{data}) - 1; $i++) {
+	$arrayToBeWritten = array(($result->data[$i])->Phrase , ((($result->data[$i])->SearchedWith)[0]->Shows));
+	
+	 fputcsv($fp , $arrayToBeWritten);
+	 print_r($arrayToBeWritten);
 }
 
 
 
 fclose($fp);
+
+
 ?>
