@@ -1,2 +1,9 @@
-Here youll see the results
-*param *quantity
+	$timeSetter = microtime(true);
+	$result = file_get_contents('https://api-sandbox.direct.yandex.ru/v4/json/', 0, $context);
+	$timeSetter = microtime(true)-$timeSetter;	# Возвращаем ответ
+	print_r($timeSetter);
+
+
+Hello
+Bye
+Guilty

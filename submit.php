@@ -3,7 +3,7 @@ function getWordstat($method, $params = false)
 {
 	# формирование запроса    
 	$request = array(
-		'token'=> 'AgAAAAAQkWMBAAaDbvmPfAHRI0dcmci3iRTLw6s', 
+		'token'=> 'AgAAAAAFSkYoAAbL25qUQK6olENcsMoX17FbUi0', 
 		'method'=> $method,
 		'param'=> is_array($params)? utf8($params):$params,
 		'locale'=> 'ru',
@@ -51,39 +51,38 @@ function utf8($struct) {
 # 215 - Дубна
 # 225 - Russia
 
-# getting input info
-
+# Получаем данные с фронта
 $valuesToArray = $_POST['inputInfo'];
 $arrayWithWords = explode(PHP_EOL, $valuesToArray);
 
+# Коцаем запросы на чанки по 3 - самое оптимальное значение
+$splicedArray = array_chunk($arrayWithWords, 3);
+
 $regionGot = $_POST['regionID']; 
 
-$request = getWordstat('CreateNewWordstatReport', array(
-						'Phrases' => $arrayWithWords,
-						'GeoID' => array((int)$regionGot))
-						);		
-# Отчет формируется, ждем, чем больше запросов, тем выше ставим время
-sleep(15);
+# Отправляем запросы кусочками , вывод можно посмотреть в файле , выводится последовательно, каждые 6 секунд
+for ($j = 0 ; $j < count($splicedArray); $j++){
+	$request = getWordstat('CreateNewWordstatReport', array(
+							'Phrases' => $splicedArray[$j],
+							'GeoID' => array((int)$regionGot))
+							);		
 
-$result = getWordstat('GetWordstatReport', $request->data);
+	# Отчет формируется, ждем, чем больше запросов, тем выше ставим время
+	sleep(5);
 
-getWordstat('DeleteWordstatReport', $request->data);
+	$result = getWordstat('GetWordstatReport', $request->data);
 
-# Обрабатываем отчет
+	getWordstat('DeleteWordstatReport', $request->data);
 
-print_r(($result->data[0])->SearchedWith);
+	// # Записываем информацию в файл
+	$fp = fopen('lidn.csv', 'a');
 
-# Записываем информацию в файл
-$fp = fopen('lidn.csv', 'w');
+	for ($i = 0; $i <= count($result->{data}) - 1; $i++) {
+		$arrayToBeWritten = array(($result->data[$i])->Phrase , ((($result->data[$i])->SearchedWith)[0]->Shows));
+		fputcsv($fp , $arrayToBeWritten);
+	}
 
-for ($i = 0; $i <= count($result->{data}) - 1; $i++) {
-	$arrayToBeWritten = array(($result->data[$i])->Phrase , ((($result->data[$i])->SearchedWith)[0]->Shows));
-	
-	 fputcsv($fp , $arrayToBeWritten);
-	 print_r($arrayToBeWritten);
 }
-
-
 
 fclose($fp);
 
